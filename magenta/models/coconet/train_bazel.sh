@@ -1,14 +1,24 @@
 #!/bin/bash
+# Length
+#$ -l test
+# Run in current directory
+#$ -cwd
+# Use GPU
+#$ -l gpus=1
+
+source /gpfs/data/drlab/nate/magenta-env/bin/activate
 
 set -x
 set -e
 
 # Change this to dir for saving experiment logs.
-logdir="logs"
+logdir="/data/drlab/nate/magenta/magenta/models/coconet/logs"
 # Change this to where data is loaded from.
 data_dir="testdata"
 # Change this to your dataset class, which can be defined in lib_data.py.
-dataset=TestData
+#dataset=TestData
+#dataset=Jsb16thSeparated
+dataset=NateTest
 
 # Data preprocessing.
 crop_piece_len=64

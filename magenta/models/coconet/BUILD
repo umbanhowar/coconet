@@ -23,6 +23,7 @@ py_library(
     srcs_version = "PY2AND3",
     data = [
         "testdata/TestData.npz",
+        "testdata/Jsb16thSeparated.npz",
     ],
     deps = [
         ":lib_mask",
@@ -153,6 +154,8 @@ py_binary(
     srcs = ["coconet_train.py"],
     data = [
         "testdata/TestData.npz",
+        "testdata/Jsb16thSeparated.npz",
+        "testdata/NateTest.npz",
     ],
     srcs_version = "PY2AND3",
     visibility = [

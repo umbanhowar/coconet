@@ -142,6 +142,14 @@ class TestData(Dataset):
   num_instruments = 4
   qpm = 60
 
+class NateTest(Dataset):
+  key = "NateTest"
+  min_pitch = 0
+  max_pitch = 127
+  shortest_duration = 0.125
+  num_instruments = 4
+  qpm = 60
+
 
 class Batch(object):
   """A Batch of training/evaluation data."""
