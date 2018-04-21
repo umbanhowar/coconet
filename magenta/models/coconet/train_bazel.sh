@@ -18,7 +18,7 @@ data_dir="testdata"
 # Change this to your dataset class, which can be defined in lib_data.py.
 #dataset=TestData
 #dataset=Jsb16thSeparated
-dataset=NateTest
+dataset=LPDTest
 
 # Data preprocessing.
 crop_piece_len=64

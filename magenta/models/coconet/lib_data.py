@@ -142,13 +142,48 @@ class TestData(Dataset):
   num_instruments = 4
   qpm = 60
 
-class NateTest(Dataset):
-  key = "NateTest"
+class LPDTest(Dataset):
+  key = "LPDTest"
   min_pitch = 0
   max_pitch = 127
   shortest_duration = 0.125
   num_instruments = 4
   qpm = 60
+
+  def get_pianorolls(self, sequences=None):
+    """Return the pianorolls. Sequences for this dataset are already pianorolls.
+    """
+    #TODO
+
+    if sequences is None:
+      sequences = self.get_sequences()
+    return list(sequences)
+
+  def get_featuremaps(self, sequences=None):
+    """Turn sequences into features for training/evaluation.
+    """
+    #TODO
+
+    if sequences is None:
+      sequences = self.get_sequences()
+
+    pianorolls = []
+    masks = []
+
+    for pianoroll in sequences:
+      pianoroll = lib_util.random_crop(pianoroll, self.hparams.crop_piece_len)
+      mask = lib_mask.get_mask(
+          self.hparams.maskout_method,
+          pianoroll.shape,
+          separate_instruments=self.hparams.separate_instruments,
+          blankout_ratio=self.hparams.corrupt_ratio)
+      pianorolls.append(pianoroll)
+      masks.append(mask)
+
+    (pianorolls, masks), lengths = lib_util.pad_and_stack(pianorolls, masks)
+    assert pianorolls.ndim == 4 and masks.ndim == 4
+    assert pianorolls.shape == masks.shape
+    return Batch(pianorolls=pianorolls, masks=masks, lengths=lengths)
 
 
 class Batch(object):

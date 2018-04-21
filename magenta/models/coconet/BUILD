@@ -155,7 +155,7 @@ py_binary(
     data = [
         "testdata/TestData.npz",
         "testdata/Jsb16thSeparated.npz",
-        "testdata/NateTest.npz",
+        "testdata/LPDTest.npz",
     ],
     srcs_version = "PY2AND3",
     visibility = [
