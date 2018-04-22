@@ -1,5 +1,7 @@
 #!/bin/bash
 
+source /gpfs/data/drlab/nate/magenta-env/bin/activate
+
 set -x
 set -e
 
@@ -11,7 +13,7 @@ set -e
 checkpoint=$1
 
 # Change this to path for saving samples.
-generation_output_dir="samples"
+generation_output_dir="/gpfs/data/drlab/nate/magenta/magenta/models/coconet/samples"
 
 # Generation parameters.
 # Number of samples to generate in a batch.
@@ -29,5 +31,3 @@ bazel run :coconet_sample \
 --strategy=$strategy \
 --generation_output_dir=$generation_output_dir \
 --logtostderr
-
-

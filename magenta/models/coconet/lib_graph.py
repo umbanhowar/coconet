@@ -100,18 +100,25 @@ class CoconetGraph(object):
             self.loss, var_list=tf.trainable_variables())
     ]
 
+  # def compute_predictions_(self, logits):
+  #   return (tf.nn.softmax(logits, dim=2)
+  #           if self.hparams.use_softmax_loss else tf.nn.sigmoid(logits))
+
   def compute_predictions(self, logits):
-    return (tf.nn.softmax(logits, dim=2)
-            if self.hparams.use_softmax_loss else tf.nn.sigmoid(logits))
+    return tf.nn.sigmoid(logits)
+
+  # def compute_cross_entropy_(self, logits, labels):
+  #   if self.hparams.use_softmax_loss:
+  #     # don't use tf.nn.softmax_cross_entropy because we need the shape to
+  #     # remain constant
+  #     return -tf.nn.log_softmax(logits, dim=2) * labels
+  #   else:
+  #     return tf.nn.sigmoid_cross_entropy_with_logits(
+  #         logits=logits, labels=labels)
 
   def compute_cross_entropy(self, logits, labels):
-    if self.hparams.use_softmax_loss:
-      # don't use tf.nn.softmax_cross_entropy because we need the shape to
-      # remain constant
-      return -tf.nn.log_softmax(logits, dim=2) * labels
-    else:
-      return tf.nn.sigmoid_cross_entropy_with_logits(
-          logits=logits, labels=labels)
+    return tf.nn.sigmoid_cross_entropy_with_logits(
+        logits=logits, labels=labels)
 
   def compute_loss(self, unreduced_loss):
     """Computes scaled loss based on mask out size."""
@@ -128,7 +135,9 @@ class CoconetGraph(object):
 
     # Compute numbers of variables
     # #timesteps * #variables per timestep
-    variable_axis = 3 if self.hparams.use_softmax_loss else 2
+
+    #variable_axis = 3 if self.hparams.use_softmax_loss else 2
+    variable_axis = 3
     dd = (
         self.lengths[:, None, None, None] * tf.to_float(
             tf.shape(self.pianorolls)[variable_axis]))

@@ -120,13 +120,17 @@ class Hyperparameters(object):
     else:
       return [self.crop_piece_len, self.num_pitches, 1]
 
+  # @property
+  # def use_softmax_loss_(self):
+  #   if not self.separate_instruments and (self.num_instruments > 1 or
+  #                                         self.num_instruments == 0):
+  #     return False
+  #   else:
+  #     return True
+
   @property
   def use_softmax_loss(self):
-    if not self.separate_instruments and (self.num_instruments > 1 or
-                                          self.num_instruments == 0):
-      return False
-    else:
-      return True
+    return False
 
   def __str__(self):
     """Get all hyperparameters as a string."""
