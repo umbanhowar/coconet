@@ -10,15 +10,16 @@ set -e
 # http://download.magenta.tensorflow.org/models/coconet/checkpoint.zip
 # and pass the path up to the inner most directory as first argument when running this
 # script.
-checkpoint=$1
+#checkpoint=$1
+checkpoint="/data/drlab/nate/magenta/magenta/models/coconet/logs/straight-32-64_bs=10,corrupt=0.5,len=64,lr=0.0625,mm=orderless,num_i=4,n_pch=128,mask_only=False,quant=0.125,rescale=True,sep=True,res=True,soft=False"
 
 # Change this to path for saving samples.
 generation_output_dir="/gpfs/data/drlab/nate/magenta/magenta/models/coconet/samples"
 
 # Generation parameters.
 # Number of samples to generate in a batch.
-gen_batch_size=2
-piece_length=16
+gen_batch_size=1
+piece_length=64
 strategy=igibbs
 
 # Run command.

@@ -49,15 +49,24 @@ class BaseSampler(lib_util.Factory):
   def separate_instruments(self):
     return self.wmodel.hparams.separate_instruments
 
+  # def sample_predictions_(self, predictions, temperature=None):
+  #   """Sample from model outputs."""
+  #   temperature = self.temperature if temperature is None else temperature
+  #   if self.separate_instruments:
+  #     return lib_util.sample(
+  #         predictions, axis=2, onehot=True, temperature=temperature)
+  #   else:
+  #     return lib_util.sample_bernoulli(
+  #         0.5 * predictions, temperature=temperature)
+
+
   def sample_predictions(self, predictions, temperature=None):
     """Sample from model outputs."""
     temperature = self.temperature if temperature is None else temperature
-    if self.separate_instruments:
-      return lib_util.sample(
-          predictions, axis=2, onehot=True, temperature=temperature)
-    else:
-      return lib_util.sample_bernoulli(
-          0.5 * predictions, temperature=temperature)
+    # TODO: why do they multiply by 0.5 here?
+    #return lib_util.sample_bernoulli(
+    #      0.5 * predictions, temperature=temperature)
+    return lib_util.sample_naive(predictions) 
 
   @classmethod
   def __repr__(cls, self):  # pylint: disable=unexpected-special-method-signature
@@ -134,6 +143,17 @@ class UniformRandomSampler(BaseSampler):
     self.logger.log(pianorolls=pianorolls, masks=masks, predictions=predictions)
     return pianorolls
 
+# class IndependentSampler_(BaseSampler):
+#   """Samples all variables independently based on a single model evaluation."""
+#   key = "independent"
+
+#   def _run(self, pianorolls, masks):
+#     predictions = self.predictor(pianorolls, masks)
+#     samples = self.sample_predictions(predictions)
+#     assert (samples * masks).sum() == masks.max(axis=2).sum()
+#     pianorolls = np.where(masks, samples, pianorolls)
+#     self.logger.log(pianorolls=pianorolls, masks=masks, predictions=predictions)
+#     return pianorolls
 
 class IndependentSampler(BaseSampler):
   """Samples all variables independently based on a single model evaluation."""
@@ -141,9 +161,12 @@ class IndependentSampler(BaseSampler):
 
   def _run(self, pianorolls, masks):
     predictions = self.predictor(pianorolls, masks)
+    print('predictions shape', predictions.shape)
     samples = self.sample_predictions(predictions)
-    assert (samples * masks).sum() == masks.max(axis=2).sum()
+    #assert (samples * masks).sum() == masks.max(axis=2).sum()
     pianorolls = np.where(masks, samples, pianorolls)
+    print('Samples shape', samples.shape)
+    print('Masks shape', masks.shape)
     self.logger.log(pianorolls=pianorolls, masks=masks, predictions=predictions)
     return pianorolls
 
@@ -229,13 +252,13 @@ class GibbsSampler(BaseSampler):
             outer_masks=masks,
             separate_instruments=self.separate_instruments)
         pianorolls = self.sampler.run_nonverbose(pianorolls, inner_masks)
-        if self.separate_instruments:
-          # Ensure sampler did actually sample everything under inner_masks.
-          assert np.all(
-              np.where(
-                  inner_masks.max(axis=2),
-                  np.isclose(pianorolls.max(axis=2), 1),
-                  1))
+        # if self.separate_instruments:
+        #   # Ensure sampler did actually sample everything under inner_masks.
+        #   assert np.all(
+        #       np.where(
+        #           inner_masks.max(axis=2),
+        #           np.isclose(pianorolls.max(axis=2), 1),
+        #           1))
         self.logger.log(
             pianorolls=pianorolls, masks=inner_masks, predictions=pianorolls)
 
@@ -294,7 +317,7 @@ class BaseMasker(lib_util.Factory):
     """Sample a batch of masks.
 
     Args:
-      shape: sequence of length 4 specifying desired shape of the mask
+      shape: sequence of length 4 specifyBernoulliMaskering desired shape of the mask
       outer_masks: indicator of area within which to mask out
       separate_instruments: whether instruments are separated
 
@@ -321,6 +344,7 @@ class BernoulliMasker(BaseMasker):
       A batch of masks.
     """
     assert pm is not None
+    print('bernoulli masker shape', str(shape))
     bb, tt, pp, ii = shape
     if separate_instruments:
       probs = np.tile(np.random.random([bb, tt, 1, ii]), [1, 1, pp, 1])

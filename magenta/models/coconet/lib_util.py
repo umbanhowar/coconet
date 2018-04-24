@@ -45,6 +45,7 @@ def sample_bernoulli(p, temperature=1):
   Returns:
     A binary array of sampled values, the same shape as `p`.
   """
+  print('Sample bernoulli enter shape', p.shape)
   if temperature == 0.:
     sampled = p > 0.5
   else:
@@ -60,7 +61,11 @@ def sample_bernoulli(p, temperature=1):
                                                 np.max(p)))
 
     sampled = np.random.random(p.shape) < p
+  print('Sample bernoulli leave shape', sampled.shape)
   return sampled
+
+def sample_naive(p):
+  return (p > 0.5).astype(int)
 
 
 def softmax(p, axis=None, temperature=1):
