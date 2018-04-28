@@ -32,6 +32,38 @@ def atomic_file(path):
   tf.gfile.Rename("%s.tmp" % path, path, overwrite=True)
 
 
+# def sample_bernoulli(p, temperature=1):
+#   """Sample an array of Bernoullis.
+
+#   Args:
+#     p: an array of Bernoulli probabilities.
+#     temperature: if not 1, transform the distribution by dividing the log
+#         probabilities and renormalizing. Values greater than 1 increase entropy,
+#         values less than 1 decrease entropy. A value of 0 yields a deterministic
+#         distribution that chooses the mode.
+
+#   Returns:
+#     A binary array of sampled values, the same shape as `p`.
+#   """
+#   print('Sample bernoulli enter shape', p.shape)
+#   if temperature == 0.:
+#     sampled = p > 0.5
+#   else:
+#     pp = np.stack([p, 1 - p])
+#     logpp = np.log(pp)
+#     logpp /= temperature
+#     logpp -= logpp.max(axis=0, keepdims=True)
+#     p = np.exp(logpp)
+#     p /= p.sum(axis=0)
+#     print("%.5f < %.5f < %.5f < %.5f < %.5g" % (np.min(p), np.percentile(p, 25),
+#                                                 np.percentile(p, 50),
+#                                                 np.percentile(p, 75),
+#                                                 np.max(p)))
+
+#     sampled = np.random.random(p.shape) < p
+#   print('Sample bernoulli leave shape', sampled.shape)
+#   return sampled
+
 def sample_bernoulli(p, temperature=1):
   """Sample an array of Bernoullis.
 
@@ -60,12 +92,13 @@ def sample_bernoulli(p, temperature=1):
                                                 np.percentile(p, 75),
                                                 np.max(p)))
 
-    sampled = np.random.random(p.shape) < p
+    sampled = np.random.random(p[0, :, :, :].shape) < p[0, :, :, :, :]
   print('Sample bernoulli leave shape', sampled.shape)
   return sampled
 
 def sample_naive(p):
-  return (p > 0.5).astype(int)
+  temp = 0.9
+  return (np.random.random(p.shape) < p).astype(int)
 
 
 def softmax(p, axis=None, temperature=1):

@@ -21,7 +21,7 @@ data_dir="testdata"
 dataset=LPDTest
 
 # Data preprocessing.
-crop_piece_len=64
+crop_piece_len=200
 separate_instruments=True
 quantization_level=0.125  # 16th notes
 
@@ -29,7 +29,7 @@ quantization_level=0.125  # 16th notes
 maskout_method=orderless
 num_layers=32
 num_filters=64
-batch_size=10
+batch_size=5
 
 # Run command.
 bazel run :coconet_train \

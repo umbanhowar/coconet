@@ -64,9 +64,9 @@ class BaseSampler(lib_util.Factory):
     """Sample from model outputs."""
     temperature = self.temperature if temperature is None else temperature
     # TODO: why do they multiply by 0.5 here?
-    #return lib_util.sample_bernoulli(
-    #      0.5 * predictions, temperature=temperature)
-    return lib_util.sample_naive(predictions) 
+    return lib_util.sample_bernoulli(
+          0.5 * predictions, temperature=temperature)
+    #return lib_util.sample_naive(predictions) 
 
   @classmethod
   def __repr__(cls, self):  # pylint: disable=unexpected-special-method-signature
@@ -317,7 +317,7 @@ class BaseMasker(lib_util.Factory):
     """Sample a batch of masks.
 
     Args:
-      shape: sequence of length 4 specifyBernoulliMaskering desired shape of the mask
+      shape: sequence of length 4 specifying desired shape of the mask
       outer_masks: indicator of area within which to mask out
       separate_instruments: whether instruments are separated
 
@@ -326,6 +326,33 @@ class BaseMasker(lib_util.Factory):
     """
     raise NotImplementedError()
 
+
+# class BernoulliMasker(BaseMasker):
+#   """Samples each element iid from a Bernoulli distribution."""
+#   key = "bernoulli"
+
+#   def __call__(self, shape, pm=None, outer_masks=1., separate_instruments=True):
+#     """Sample a batch of masks.
+
+#     Args:
+#       shape: sequence of length 4 specifying desired shape of the mask
+#       pm: Bernoulli success probability
+#       outer_masks: indicator of area within which to mask out
+#       separate_instruments: whether instruments are separated
+
+#     Returns:
+#       A batch of masks.
+#     """
+#     assert pm is not None
+#     print('bernoulli masker shape', str(shape))
+#     bb, tt, pp, ii = shape
+#     if separate_instruments:
+#       probs = np.tile(np.random.random([bb, tt, 1, ii]), [1, 1, pp, 1])
+#     else:
+#       assert ii == 1
+#       probs = np.random.random([bb, tt, pp, ii]).astype(np.float32)
+#     masks = probs < pm
+#     return masks * outer_masks
 
 class BernoulliMasker(BaseMasker):
   """Samples each element iid from a Bernoulli distribution."""
@@ -347,7 +374,7 @@ class BernoulliMasker(BaseMasker):
     print('bernoulli masker shape', str(shape))
     bb, tt, pp, ii = shape
     if separate_instruments:
-      probs = np.tile(np.random.random([bb, tt, 1, ii]), [1, 1, pp, 1])
+      probs = np.tile(np.random.random([bb, tt, pp, 1]), [1, 1, 1, ii])
     else:
       assert ii == 1
       probs = np.random.random([bb, tt, pp, ii]).astype(np.float32)

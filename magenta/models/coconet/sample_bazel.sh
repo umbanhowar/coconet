@@ -11,7 +11,7 @@ set -e
 # and pass the path up to the inner most directory as first argument when running this
 # script.
 #checkpoint=$1
-checkpoint="/data/drlab/nate/magenta/magenta/models/coconet/logs/straight-32-64_bs=10,corrupt=0.5,len=64,lr=0.0625,mm=orderless,num_i=4,n_pch=128,mask_only=False,quant=0.125,rescale=True,sep=True,res=True,soft=False"
+checkpoint="/data/drlab/nate/magenta/magenta/models/coconet/logs/straight-32-64_bs=5,corrupt=0.5,len=200,lr=0.0625,mm=orderless,num_i=4,n_pch=128,mask_only=False,quant=0.125,rescale=True,sep=True,res=True,soft=False"
 
 # Change this to path for saving samples.
 generation_output_dir="/gpfs/data/drlab/nate/magenta/magenta/models/coconet/samples"
@@ -28,7 +28,9 @@ bazel run :coconet_sample \
 --checkpoint="$checkpoint" \
 --gen_batch_size=$gen_batch_size \
 --piece_length=$piece_length \
---temperature=0.99 \
+--temperature=0.5 \
 --strategy=$strategy \
 --generation_output_dir=$generation_output_dir \
 --logtostderr
+
+#--temperature=0.99 \

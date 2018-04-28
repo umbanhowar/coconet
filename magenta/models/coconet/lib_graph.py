@@ -137,15 +137,30 @@ class CoconetGraph(object):
     # #timesteps * #variables per timestep
 
     #variable_axis = 3 if self.hparams.use_softmax_loss else 2
-    variable_axis = 3
+    variable_axis = 2 # Should be pitch dimension
+    second_var_ax = 3 # Inst dimension
+    # dd = (
+    #     self.lengths[:, None, None, None] * tf.to_float(
+    #         tf.shape(self.pianorolls)[variable_axis]))
+
+
     dd = (
         self.lengths[:, None, None, None] * tf.to_float(
-            tf.shape(self.pianorolls)[variable_axis]))
+            tf.shape(self.pianorolls)[variable_axis])
+                * tf.to_float(tf.shape(self.pianorolls)[second_var_ax]))
+
     reduced_dd = tf.reduce_sum(dd)
 
+    # reduced_dd should be the total number of variables in the batch
+
     # Compute numbers of variables to be predicted/conditioned on
-    mask_size = tf.reduce_sum(mask, axis=[1, variable_axis], keep_dims=True)
-    unmask_size = tf.reduce_sum(unmask, axis=[1, variable_axis], keep_dims=True)
+    # mask_size = tf.reduce_sum(mask, axis=[1, variable_axis], keep_dims=True)
+    # unmask_size = tf.reduce_sum(unmask, axis=[1, variable_axis], keep_dims=True)
+
+    mask_size = tf.reduce_sum(mask,
+      axis=[1, variable_axis, second_var_ax], keep_dims=True)
+    unmask_size = tf.reduce_sum(unmask,
+      axis=[1, variable_axis, second_var_ax], keep_dims=True)
 
     unreduced_loss *= pad_mask
     if self.hparams.rescale_loss:
@@ -153,6 +168,8 @@ class CoconetGraph(object):
 
     # Compute average loss over entire set of variables
     self.loss_total = tf.reduce_sum(unreduced_loss) / reduced_dd
+
+    # TODO: definitely wrong, but shouldn't affect full loss computation!!
 
     # Compute separate losses for masked/unmasked variables
     # NOTE: indexing the pitch dimension with 0 because the mask is constant

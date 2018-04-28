@@ -84,6 +84,42 @@ class BernoulliMaskoutMethod(MaskoutMethod):
     return mask
 
 
+# class OrderlessMaskoutMethod(MaskoutMethod):
+#   """Masking distribution for orderless nade training."""
+
+#   key = "orderless"
+
+#   def __call__(self, shape, separate_instruments=True, **unused_kwargs):
+#     """Sample a mask.
+
+#     Args:
+#       shape: shape of pianoroll (time, pitch, instrument)
+#       separate_instruments: whether instruments are separated
+
+#     Returns:
+#       A mask of shape `shape`.
+#     """
+#     tt, pp, ii = shape
+
+#     if separate_instruments:
+#       d = tt * ii
+#     else:
+#       assert ii == 1
+#       d = tt * pp
+#     # sample a mask size
+#     k = np.random.choice(d) + 1
+#     # sample a mask of size k
+#     i = np.random.choice(d, size=k, replace=False)
+
+#     mask = np.zeros(d, dtype=np.float32)
+#     mask[i] = 1.
+#     if separate_instruments:
+#       mask = mask.reshape((tt, 1, ii))
+#       mask = np.tile(mask, [1, pp, 1])
+#     else:
+#       mask = mask.reshape((tt, pp, 1))
+#     return mask
+
 class OrderlessMaskoutMethod(MaskoutMethod):
   """Masking distribution for orderless nade training."""
 
@@ -101,11 +137,9 @@ class OrderlessMaskoutMethod(MaskoutMethod):
     """
     tt, pp, ii = shape
 
-    if separate_instruments:
-      d = tt * ii
-    else:
-      assert ii == 1
-      d = tt * pp
+    # Mask exists in the time-pitch dimension
+    d = tt * pp
+
     # sample a mask size
     k = np.random.choice(d) + 1
     # sample a mask of size k
@@ -113,9 +147,8 @@ class OrderlessMaskoutMethod(MaskoutMethod):
 
     mask = np.zeros(d, dtype=np.float32)
     mask[i] = 1.
-    if separate_instruments:
-      mask = mask.reshape((tt, 1, ii))
-      mask = np.tile(mask, [1, pp, 1])
-    else:
-      mask = mask.reshape((tt, pp, 1))
+
+    # Tile the mask along the instrument dimension.
+    mask = mask.reshape((tt, pp, 1))
+    mask = np.tile(mask, [1, 1, ii])
     return mask

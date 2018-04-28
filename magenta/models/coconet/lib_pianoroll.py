@@ -30,7 +30,8 @@ class PianorollEncoderDecoder(object):
 
   qpm = 120
   # Oboe, English horn, clarinet, bassoon, sounds better on timidity.
-  programs = [69, 70, 72, 71]
+  #programs = [69, 70, 72, 71]
+  programs = [1, 1, 1, 1]
 
   def __init__(self,
                shortest_duration=0.125,
